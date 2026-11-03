@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GTA SA-MP SSRP Edit Tools</title>
+    <!-- Favicon Icon Tab Chrome / Browser -->
+    <link rel="icon" type="image/png" href="https://www.upload.ee/image/19927799/file_0000000050188207996c7f4662b9624d.png">
+    <link rel="apple-touch-icon" href="https://www.upload.ee/image/19927799/file_0000000050188207996c7f4662b9624d.png">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font (GTA SA Chat Font Alternatives) -->
+    <link href="https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+
+        /* Canvas Style Shadow for SA-MP feel */
+        .canvas-container {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+    <!-- Header Navigation -->
+    <header class="bg-slate-900 border-b border-slate-800 px-4 md:px-6 py-3 flex flex-wrap justify-between items-center gap-4 shadow-lg">
+        <a href="https://bit.ly/STCo" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-3 bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 hover:border-indigo-500/50 p-2 pr-4 rounded-xl transition shadow-md group">
+            <!-- ST Company Logo Image from URL -->
+            <div class="h-10 px-2 bg-slate-950/80 border border-slate-700/50 rounded-lg flex items-center justify-center overflow-hidden shadow-inner group-hover:scale-105 transition-transform">
+                <img src="https://www.upload.ee/image/19927799/file_0000000050188207996c7f4662b9624d.png" 
+                     alt="ST Company Logo" 
+                     class="h-7 w-auto object-contain"
+                     onerror="this.onerror=null; this.parentElement.innerHTML='<span class=\'font-extrabold text-white text-lg font-mono px-1\'>STCo</span>';">
+            </div>
+            <div>
+                <div class="flex items-center gap-1.5">
+                    <h1 class="text-base sm:text-lg font-bold tracking-wide text-white group-hover:text-indigo-300 transition">
+                        SSRP Edit Tools by SkyTechnology Company
+                    </h1>
+                    <i class="fa-solid fa-arrow-up-right-from-square text-xs text-indigo-400"></i>
+                </div>
+                <p class="text-xs text-slate-400">GTA SA-MP Screenshot Roleplay Generator</p>
+            </div>
+        </a>
+        <div class="flex items-center space-x-2 sm:space-x-3 w-full sm:w-auto justify-end">
+            <button id="reset-btn" class="px-3 sm:px-4 py-2 text-xs sm:text-sm bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition border border-slate-700 flex items-center gap-1.5">
+                <i class="fa-solid fa-rotate-left"></i> Reset All
+            </button>
+            <button id="download-btn" class="px-4 sm:px-5 py-2 text-xs sm:text-sm bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-lg transition shadow-md flex items-center gap-1.5">
+                <i class="fa-solid fa-download"></i> Download Screenshot
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Workspace Layout -->
+    <main class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6 p-3 md:p-6 max-w-[1800px] w-full mx-auto">
+        
+        <!-- Left Panel: Controls & Dialogue Builder (5 Cols) -->
+        <section class="lg:col-span-5 flex flex-col space-y-4 md:space-y-6">
+            
+            <!-- 1. Background Image Loader -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 md:p-5 shadow-sm">
+                <h2 class="text-xs md:text-sm font-semibold uppercase tracking-wider text-indigo-400 mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-image"></i> 1. Gambar Background
+                </h2>
+                <div class="flex flex-col gap-3">
+                    <label for="image-upload" class="border-2 border-dashed border-slate-700 hover:border-indigo-500 bg-slate-800/50 hover:bg-slate-800 rounded-xl p-4 text-center cursor-pointer transition flex flex-col items-center justify-center group">
+                        <i class="fa-solid fa-cloud-arrow-up text-3xl text-slate-500 group-hover:text-indigo-400 transition mb-2"></i>
+                        <span class="text-sm font-medium text-slate-300">Klik / Tap untuk upload foto screenshot</span>
+                        <span class="text-xs text-slate-500 mt-1">Format PNG, JPG, WebP</span>
+                        <input type="file" id="image-upload" accept="image/*" class="hidden">
+                    </label>
+                    <div class="flex items-center gap-2">
+                        <button id="preset-bg-btn" class="text-xs text-slate-400 hover:text-slate-200 underline">Gunakan Canvas Blank Default</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Text Presets & Add Line -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 md:p-5 shadow-sm space-y-4">
+                <h2 class="text-xs md:text-sm font-semibold uppercase tracking-wider text-indigo-400 flex items-center gap-2">
+                    <i class="fa-solid fa-comment-dots"></i> 2. Tambahkan Baris Teks Chat
+                </h2>
+
+                <!-- Type Selector -->
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1.5">Tipe Dialog / Chat</label>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        <button data-type="chat" class="type-btn active px-3 py-2 text-xs font-semibold rounded-lg border border-slate-700 bg-slate-800 text-white hover:bg-slate-700 transition text-center flex items-center justify-center gap-1.5 touch-manipulation">
+                            <span class="w-2.5 h-2.5 rounded-full bg-white"></span> Chat Biasa
+                        </button>
+                        <button data-type="me" class="type-btn px-3 py-2 text-xs font-semibold rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700 transition text-center flex items-center justify-center gap-1.5 touch-manipulation">
+                            <span class="w-2.5 h-2.5 rounded-full bg-[#C2A2DA]"></span> RP /me
+                        </button>
+                        <button data-type="do" class="type-btn px-3 py-2 text-xs font-semibold rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700 transition text-center flex items-center justify-center gap-1.5 touch-manipulation">
+                            <span class="w-2.5 h-2.5 rounded-full bg-[#C2A2DA]"></span> RP /do
+                        </button>
+                        <button data-type="whisper" class="type-btn px-3 py-2 text-xs font-semibold rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700 transition text-center flex items-center justify-center gap-1.5 touch-manipulation">
+                            <span class="w-2.5 h-2.5 rounded-full bg-yellow-300"></span> Whisper
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Input Text Box -->
+                <div class="space-y-2">
+                    <label class="block text-xs font-medium text-slate-400">Isi Teks (Tanpa Perlu Enter)</label>
+                    <textarea id="line-input" rows="3" placeholder="Ketik teks di sini..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition resize-none"></textarea>
+                    
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs text-slate-400">Warna Custom:</label>
+                            <input type="color" id="line-color" value="#ffffff" class="w-8 h-8 bg-transparent border-0 cursor-pointer rounded">
+                        </div>
+                        <button id="add-line-btn" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs sm:text-sm rounded-lg transition flex items-center gap-2 shadow touch-manipulation">
+                            <i class="fa-solid fa-plus"></i> Tambah Baris
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Dialogue Items List -->
+                <div class="mt-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="text-xs font-medium text-slate-400">Daftar Baris Teks (<span id="line-count">0</span>)</label>
+                        <button id="clear-lines-btn" class="text-xs text-rose-400 hover:text-rose-300">Hapus Semua</button>
+                    </div>
+                    <div id="lines-container" class="space-y-2 max-h-60 overflow-y-auto pr-1">
+                        <!-- Dynamic Lines will appear here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Styling & Positioning Controls -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 md:p-5 shadow-sm space-y-4">
+                <h2 class="text-xs md:text-sm font-semibold uppercase tracking-wider text-indigo-400 flex items-center gap-2">
+                    <i class="fa-solid fa-sliders"></i> 3. Pengaturan Font & Posisi Ingame
+                </h2>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Jenis Font</label>
+                        <select id="font-family" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
+                            <option value="Arial">Arial (Default GTA)</option>
+                            <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
+                            <option value="Verdana">Verdana</option>
+                            <option value="Tahoma">Tahoma</option>
+                            <option value="'Courier New', monospace">Courier New (Classic)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Posisi Preset Teks</label>
+                        <select id="position-preset" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
+                            <option value="bottom-left">Kiri Bawah (Default Chat)</option>
+                            <option value="top-left">Kiri Atas (RP /do /me)</option>
+                            <option value="custom">Manual / Drag</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Ukuran Font (<span id="fontsize-val">15</span>px)</label>
+                        <input type="range" id="font-size" min="10" max="36" value="15" class="w-full accent-indigo-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Jarak Baris (<span id="lineheight-val">4</span>px)</label>
+                        <input type="range" id="line-height" min="0" max="25" value="4" class="w-full accent-indigo-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Tebal Bayangan Outline</label>
+                        <select id="text-stroke" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
+                            <option value="0" selected>Tanpa Outline (No Stroke)</option>
+                            <option value="1">1px (Standard GTA)</option>
+                            <option value="2">2px (Strong Contrast)</option>
+                            <option value="3">3px (Bold Outline)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Style Font</label>
+                        <select id="font-weight" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
+                            <option value="bold">Bold (SAMP Default)</option>
+                            <option value="normal">Normal</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Manual Pos Offset sliders -->
+                <div class="pt-3 border-t border-slate-800 grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Offset Horizontal X (<span id="posx-val">20</span>px)</label>
+                        <input type="range" id="pos-x" min="0" max="1000" value="20" class="w-full accent-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Offset Vertikal Y (<span id="posy-val">20</span>px)</label>
+                        <input type="range" id="pos-y" min="0" max="1000" value="20" class="w-full accent-indigo-500">
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Right Panel: Interactive Canvas Preview (7 Cols) -->
+        <section class="lg:col-span-7 flex flex-col items-center justify-start min-h-[400px]">
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 md:p-4 w-full h-full flex flex-col items-center">
+                <div class="flex justify-between items-center w-full mb-3 px-1">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wide flex items-center gap-2">
+                        <i class="fa-solid fa-desktop"></i> Realtime Preview Canvas
+                    </span>
+                    <span class="text-xs text-slate-500" id="canvas-resolution">1280 x 720 px</span>
+                </div>
+
+                <!-- Canvas Wrap with responsive aspect ratio -->
+                <div class="w-full flex-1 flex items-center justify-center overflow-hidden bg-slate-950 rounded-lg p-2 border border-slate-800/80 relative touch-none select-none">
+                    <canvas id="ssrp-canvas" class="max-w-full max-h-[70vh] object-contain canvas-container rounded cursor-crosshair"></canvas>
+                </div>
+                
+                <p class="text-xs text-slate-500 mt-3 text-center">
+                    <i class="fa-solid fa-info-circle mr-1"></i> Tips: Anda dapat langsung menggeser/drag posisi teks pada preview canvas!
+                </p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 border-t border-slate-800 py-3 text-center text-xs text-slate-500">
+        © SSRP Edit Tools by <a href="https://bit.ly/STCo" target="_blank" rel="noopener noreferrer" class="text-indigo-400 hover:underline">SkyTechnology Company</a>. All Rights Reserved.
+    </footer>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-800 border border-slate-700 text-slate-200 text-xs px-4 py-3 rounded-lg shadow-xl translate-y-20 opacity-0 transition-all duration-300 pointer-events-none flex items-center gap-2 z-50">
+        <i class="fa-solid fa-check-circle text-emerald-400 text-base"></i>
+        <span id="toast-msg">Notifikasi</span>
+    </div>
+
+    <!-- Application Script Logic -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // DOM Elements
+            const canvas = document.getElementById('ssrp-canvas');
+            const ctx = canvas.getContext('2d');
+            const imageUpload = document.getElementById('image-upload');
+            const presetBgBtn = document.getElementById('preset-bg-btn');
+            const lineInput = document.getElementById('line-input');
+            const lineColorInput = document.getElementById('line-color');
+            const addLineBtn = document.getElementById('add-line-btn');
+            const linesContainer = document.getElementById('lines-container');
+            const clearLinesBtn = document.getElementById('clear-lines-btn');
+            const lineCountSpan = document.getElementById('line-count');
+            const downloadBtn = document.getElementById('download-btn');
+            const resetBtn = document.getElementById('reset-btn');
+            const typeBtns = document.querySelectorAll('.type-btn');
+
+            // Controls
+            const fontFamilySelect = document.getElementById('font-family');
+            const fontSizeInput = document.getElementById('font-size');
+            const fontSizeVal = document.getElementById('fontsize-val');
+            const lineHeightInput = document.getElementById('line-height');
+            const lineHeightVal = document.getElementById('lineheight-val');
+            const textStrokeSelect = document.getElementById('text-stroke');
+            const fontWeightSelect = document.getElementById('font-weight');
+            const positionPresetSelect = document.getElementById('position-preset');
+            const posXInput = document.getElementById('pos-x');
+            const posXVal = document.getElementById('posx-val');
+            const posYInput = document.getElementById('pos-y');
+            const posYVal = document.getElementById('posy-val');
+            const canvasResolutionSpan = document.getElementById('canvas-resolution');
+
+            // Default State
+            let currentType = 'chat'; // 'chat', 'me', 'do', 'whisper'
+            let bgImage = new Image();
+            let isBgLoaded = false;
+            let dialogueLines = []; // Default empty array as requested
+            
+            // Text Placement Coordinates
+            let textPosition = { x: 20, y: 20 };
+            let isDragging = false;
+            let dragStart = { x: 0, y: 0 };
+
+            // Presets Colors
+            const PRESET_COLORS = {
+                chat: '#FFFFFF',
+                me: '#C2A2DA',
+                do: '#C2A2DA',
+                whisper: '#FFFF00'
+            };
+
+            // Initialize App
+            function init() {
+                dialogueLines = []; // Empty lines
+                lineColorInput.value = PRESET_COLORS[currentType];
+                loadDefaultBg();
+                bindEvents();
+                renderLinesList();
+            }
+
+            // Create Canvas Placeholder Background
+            function loadDefaultBg() {
+                const dummyCanvas = document.createElement('canvas');
+                dummyCanvas.width = 1280;
+                dummyCanvas.height = 720;
+                const dCtx = dummyCanvas.getContext('2d');
+                
+                // Dark background gradient
+                const grad = dCtx.createLinearGradient(0, 0, 1280, 720);
+                grad.addColorStop(0, '#1e293b');
+                grad.addColorStop(1, '#0f172a');
+                dCtx.fillStyle = grad;
+                dCtx.fillRect(0, 0, 1280, 720);
+
+                // Grid pattern
+                dCtx.strokeStyle = '#334155';
+                dCtx.lineWidth = 1;
+                for(let x = 0; x < 1280; x += 60) {
+                    dCtx.beginPath(); dCtx.moveTo(x, 0); dCtx.lineTo(x, 720); dCtx.stroke();
+                }
+                for(let y = 0; y < 720; y += 60) {
+                    dCtx.beginPath(); dCtx.moveTo(0, y); dCtx.lineTo(1280, y); dCtx.stroke();
+                }
+
+                // Placeholder Info Text
+                dCtx.fillStyle = '#64748b';
+                dCtx.font = 'bold 26px Arial';
+                dCtx.textAlign = 'center';
+                dCtx.fillText('SSRP Edit Tools by SkyTechnology Company', 640, 330);
+                dCtx.font = '16px Arial';
+                dCtx.fillText('Upload foto screenshot Anda atau tambahkan teks melalui panel sebelah kiri', 640, 370);
+
+                bgImage.src = dummyCanvas.toDataURL();
+                bgImage.onload = () => {
+                    isBgLoaded = true;
+                    setCanvasSize(bgImage.width, bgImage.height);
+                    updatePositionLimits();
+                    setPositionPreset('bottom-left');
+                    draw();
+                };
+            }
+
+            // Bind Event Listeners
+            function bindEvents() {
+                // File Upload
+                imageUpload.addEventListener('change', handleImageUpload);
+                presetBgBtn.addEventListener('click', loadDefaultBg);
+
+                // Preset Buttons
+                typeBtns.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        typeBtns.forEach(b => {
+                            b.classList.remove('bg-slate-700', 'border-indigo-500', 'text-white');
+                            b.classList.add('bg-slate-800', 'text-slate-300');
+                        });
+                        btn.classList.remove('bg-slate-800', 'text-slate-300');
+                        btn.classList.add('bg-slate-700', 'border-indigo-500', 'text-white');
+                        
+                        currentType = btn.dataset.type;
+                        lineColorInput.value = PRESET_COLORS[currentType];
+                    });
+                });
+
+                // Add Dialogue Line
+                addLineBtn.addEventListener('click', addLine);
+                lineInput.addEventListener('keydown', (e) => {
+                    if(e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        addLine();
+                    }
+                });
+
+                // Clear All Lines
+                clearLinesBtn.addEventListener('click', () => {
+                    dialogueLines = [];
+                    renderLinesList();
+                    draw();
+                    showToast('Semua baris teks dibersihkan');
+                });
+
+                // Controls Change
+                fontFamilySelect.addEventListener('change', draw);
+                textStrokeSelect.addEventListener('change', draw);
+                fontWeightSelect.addEventListener('change', draw);
+
+                fontSizeInput.addEventListener('input', (e) => {
+                    fontSizeVal.textContent = e.target.value;
+                    draw();
+                });
+
+                lineHeightInput.addEventListener('input', (e) => {
+                    lineHeightVal.textContent = e.target.value;
+                    draw();
+                });
+
+                // Position Sliders
+                posXInput.addEventListener('input', (e) => {
+                    textPosition.x = parseInt(e.target.value);
+                    posXVal.textContent = textPosition.x;
+                    positionPresetSelect.value = 'custom';
+                    draw();
+                });
+
+                posYInput.addEventListener('input', (e) => {
+                    textPosition.y = parseInt(e.target.value);
+                    posYVal.textContent = textPosition.y;
+                    positionPresetSelect.value = 'custom';
+                    draw();
+                });
+
+                positionPresetSelect.addEventListener('change', (e) => {
+                    setPositionPreset(e.target.value);
+                    draw();
+                });
+
+                // Download & Reset
+                downloadBtn.addEventListener('click', downloadCanvas);
+                resetBtn.addEventListener('click', () => {
+                    dialogueLines = [];
+                    renderLinesList();
+                    setPositionPreset('bottom-left');
+                    draw();
+                    showToast('Pengaturan direset ke awal');
+                });
+
+                // Mouse Drag on Canvas
+                canvas.addEventListener('mousedown', onMouseDown);
+                canvas.addEventListener('mousemove', onMouseMove);
+                canvas.addEventListener('mouseup', onMouseUp);
+                canvas.addEventListener('mouseleave', onMouseUp);
+
+                // Touch Support for Mobile & Tablet Devices
+                canvas.addEventListener('touchstart', (e) => {
+                    const touch = e.touches[0];
+                    if (touch) {
+                        onMouseDown({ clientX: touch.clientX, clientY: touch.clientY });
+                    }
+                }, { passive: true });
+
+                canvas.addEventListener('touchmove', (e) => {
+                    const touch = e.touches[0];
+                    if (touch && isDragging) {
+                        onMouseMove({ clientX: touch.clientX, clientY: touch.clientY });
+                    }
+                }, { passive: true });
+
+                canvas.addEventListener('touchend', onMouseUp);
+            }
+
+            // Image Upload Handler
+            function handleImageUpload(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        bgImage = img;
+                        isBgLoaded = true;
+                        setCanvasSize(img.width, img.height);
+                        updatePositionLimits();
+                        setPositionPreset(positionPresetSelect.value);
+                        draw();
+                        showToast('Foto berhasil dimuat!');
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+
+            // Set Canvas Dimension
+            function setCanvasSize(w, h) {
+                canvas.width = w;
+                canvas.height = h;
+                canvasResolutionSpan.textContent = `${w} x ${h} px`;
+            }
+
+            function updatePositionLimits() {
+                posXInput.max = canvas.width;
+                posYInput.max = canvas.height;
+            }
+
+            // Set Position Presets
+            function setPositionPreset(preset) {
+                const padding = 20;
+                const fontSize = parseInt(fontSizeInput.value);
+                const lineGap = parseInt(lineHeightInput.value);
+                const totalLines = Math.max(dialogueLines.length, 1);
+                const blockHeight = totalLines * (fontSize + lineGap);
+
+                if (preset === 'bottom-left') {
+                    textPosition.x = padding;
+                    textPosition.y = Math.max(padding, canvas.height - blockHeight - padding - 20);
+                } else if (preset === 'top-left') {
+                    textPosition.x = padding;
+                    textPosition.y = padding + 15;
+                }
+                
+                posXInput.value = textPosition.x;
+                posYInput.value = textPosition.y;
+                posXVal.textContent = textPosition.x;
+                posYVal.textContent = textPosition.y;
+            }
+
+            // Add Line to List
+            function addLine() {
+                let text = lineInput.value.trim();
+                if (!text) return;
+
+                // Auto Prefix only for /me (RP /do dan whisper tidak menggunakan prefix '*')
+                if (currentType === 'me' && !text.startsWith('*')) {
+                    text = `* ${text}`;
+                }
+
+                const newLine = {
+                    id: Date.now(),
+                    type: currentType,
+                    text: text,
+                    color: lineColorInput.value
+                };
+
+                dialogueLines.push(newLine);
+                lineInput.value = '';
+                renderLinesList();
+                
+                if (positionPresetSelect.value === 'bottom-left') {
+                    setPositionPreset('bottom-left');
+                }
+
+                draw();
+            }
+
+            // Render Dialogue List Items in Control Panel
+            function renderLinesList() {
+                linesContainer.innerHTML = '';
+                lineCountSpan.textContent = dialogueLines.length;
+
+                if (dialogueLines.length === 0) {
+                    linesContainer.innerHTML = `<p class="text-xs text-slate-500 italic text-center py-2">Belum ada baris teks yang ditambahkan.</p>`;
+                    return;
+                }
+
+                dialogueLines.forEach((line, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'flex items-center justify-between gap-2 p-2 bg-slate-950 border border-slate-800 rounded-lg group text-xs';
+                    
+                    item.innerHTML = `
+                        <div class="flex items-center gap-2 overflow-hidden">
+                            <span class="w-3 h-3 rounded-full flex-shrink-0" style="background-color: ${line.color}"></span>
+                            <span class="truncate text-slate-200 font-sans" title="${line.text}">${line.text}</span>
+                        </div>
+                        <div class="flex items-center gap-1 opacity-90 sm:opacity-80 group-hover:opacity-100 flex-shrink-0">
+                            <button onclick="moveLine(${index}, -1)" class="p-1.5 sm:p-1 hover:text-indigo-400 text-slate-400" title="Naikkan"><i class="fa-solid fa-chevron-up"></i></button>
+                            <button onclick="moveLine(${index}, 1)" class="p-1.5 sm:p-1 hover:text-indigo-400 text-slate-400" title="Turunkan"><i class="fa-solid fa-chevron-down"></i></button>
+                            <button onclick="removeLine(${line.id})" class="p-1.5 sm:p-1 hover:text-rose-400 text-slate-400" title="Hapus"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    `;
+                    linesContainer.appendChild(item);
+                });
+            }
+
+            // Global Scope functions for button inline onclicks
+            window.removeLine = function(id) {
+                dialogueLines = dialogueLines.filter(l => l.id !== id);
+                renderLinesList();
+                if (positionPresetSelect.value === 'bottom-left') setPositionPreset('bottom-left');
+                draw();
+            };
+
+            window.moveLine = function(index, direction) {
+                const newIndex = index + direction;
+                if (newIndex < 0 || newIndex >= dialogueLines.length) return;
+                const temp = dialogueLines[index];
+                dialogueLines[index] = dialogueLines[newIndex];
+                dialogueLines[newIndex] = temp;
+                renderLinesList();
+                draw();
+            };
+
+            // Main Canvas Render Function
+            function draw() {
+                if (!isBgLoaded) return;
+
+                // Clear & Redraw Background
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
+
+                // Font Configurations
+                const fontSize = parseInt(fontSizeInput.value);
+                const lineSpacing = parseInt(lineHeightInput.value);
+                const strokeWidth = parseInt(textStrokeSelect.value);
+                const fontWeight = fontWeightSelect.value;
+                const fontFamily = fontFamilySelect.value;
+
+                ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
+                ctx.textBaseline = 'top';
+                ctx.textAlign = 'left';
+
+                let currentY = textPosition.y;
+
+                // Render each line with optional stroke/shadow
+                dialogueLines.forEach((line) => {
+                    const text = line.text;
+                    const x = textPosition.x;
+
+                    // Stroke Outline Hitam hanya jika strokeWidth > 0
+                    if (strokeWidth > 0) {
+                        ctx.strokeStyle = '#000000';
+                        ctx.lineWidth = strokeWidth * 2;
+                        ctx.lineJoin = 'miter';
+                        ctx.miterLimit = 2;
+                        ctx.strokeText(text, x, currentY);
+
+                        // Offset Shadow untuk kedalaman teks
+                        ctx.fillStyle = '#000000';
+                        ctx.fillText(text, x + 1, currentY + 1);
+                    }
+
+                    // Main Text Fill Color (Warna Utama Teks)
+                    ctx.fillStyle = line.color || '#FFFFFF';
+                    ctx.fillText(text, x, currentY);
+
+                    // Next line offset
+                    currentY += fontSize + lineSpacing;
+                });
+            }
+
+            // Drag & Drop Canvas Text Coordinates
+            function getCanvasCoordinates(e) {
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+                return {
+                    x: (e.clientX - rect.left) * scaleX,
+                    y: (e.clientY - rect.top) * scaleY
+                };
+            }
+
+            function onMouseDown(e) {
+                const pos = getCanvasCoordinates(e);
+                isDragging = true;
+                dragStart = {
+                    x: pos.x - textPosition.x,
+                    y: pos.y - textPosition.y
+                };
+            }
+
+            function onMouseMove(e) {
+                if (!isDragging) return;
+                const pos = getCanvasCoordinates(e);
+                textPosition.x = Math.round(pos.x - dragStart.x);
+                textPosition.y = Math.round(pos.y - dragStart.y);
+
+                // Update UI Sliders
+                posXInput.value = textPosition.x;
+                posYInput.value = textPosition.y;
+                posXVal.textContent = textPosition.x;
+                posYVal.textContent = textPosition.y;
+                positionPresetSelect.value = 'custom';
+
+                draw();
+            }
+
+            function onMouseUp() {
+                isDragging = false;
+            }
+
+            // Download Canvas as PNG Image
+            function downloadCanvas() {
+                const link = document.createElement('a');
+                link.download = `SSRP_Edit_${Date.now()}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                showToast('Gambar berhasil di-download!');
+            }
+
+            // Helper Toast Notification
+            function showToast(msg) {
+                const toast = document.getElementById('toast');
+                const toastMsg = document.getElementById('toast-msg');
+                toastMsg.textContent = msg;
+                toast.classList.remove('translate-y-20', 'opacity-0');
+                toast.classList.add('translate-y-0', 'opacity-100');
+                
+                setTimeout(() => {
+                    toast.classList.remove('translate-y-0', 'opacity-100');
+                    toast.classList.add('translate-y-20', 'opacity-0');
+                }, 3000);
+            }
+
+            // Run Init
+            init();
+        });
+    </script>
+</body>
+</html>
