@@ -108,14 +108,14 @@
                 <div>
                     <label class="block text-xs font-medium text-slate-400 mb-1.5">Tipe Dialog / Chat</label>
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                        <button data-type="chat" class="type-btn active px-3 py-2 text-xs font-semibold rounded-lg border border-slate-700 bg-slate-800 text-white hover:bg-slate-700 transition text-center flex items-center justify-center gap-1.5 touch-manipulation">
+                        <button data-type="chat" class="type-btn active px-3 py-2 text-xs font-semibold rounded-lg border border-indigo-500 bg-slate-700 text-white transition text-center flex items-center justify-center gap-1.5 touch-manipulation">
                             <span class="w-2.5 h-2.5 rounded-full bg-white"></span> Chat Biasa
                         </button>
                         <button data-type="me" class="type-btn px-3 py-2 text-xs font-semibold rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700 transition text-center flex items-center justify-center gap-1.5 touch-manipulation">
-                            <span class="w-2.5 h-2.5 rounded-full bg-[#C2A2DA]"></span> RP /me
+                            <span class="w-2.5 h-2.5 rounded-full bg-[#D6A6ED]"></span> RP /me
                         </button>
                         <button data-type="do" class="type-btn px-3 py-2 text-xs font-semibold rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700 transition text-center flex items-center justify-center gap-1.5 touch-manipulation">
-                            <span class="w-2.5 h-2.5 rounded-full bg-[#C2A2DA]"></span> RP /do
+                            <span class="w-2.5 h-2.5 rounded-full bg-[#D6A6ED]"></span> RP /do
                         </button>
                         <button data-type="whisper" class="type-btn px-3 py-2 text-xs font-semibold rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700 transition text-center flex items-center justify-center gap-1.5 touch-manipulation">
                             <span class="w-2.5 h-2.5 rounded-full bg-yellow-300"></span> Whisper
@@ -123,10 +123,16 @@
                     </div>
                 </div>
 
+                <!-- Character Name Field (Dynamic for Chat Biasa & RP /do) -->
+                <div id="char-name-box" class="space-y-1">
+                    <label id="char-name-label" class="block text-xs font-medium text-indigo-300">Nama Karakter</label>
+                    <input type="text" id="char-name-input" placeholder="Contoh: Brody Lame" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition">
+                </div>
+
                 <!-- Input Text Box -->
                 <div class="space-y-2">
-                    <label class="block text-xs font-medium text-slate-400">Isi Teks (Tanpa Perlu Enter)</label>
-                    <textarea id="line-input" rows="3" placeholder="Ketik teks di sini..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition resize-none"></textarea>
+                    <label id="line-text-label" class="block text-xs font-medium text-slate-400">Isi Pesan / Percakapan</label>
+                    <textarea id="line-input" rows="3" placeholder="Ketik pesan di sini..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition resize-none"></textarea>
                     
                     <div class="flex items-center justify-between gap-2">
                         <div class="flex items-center gap-2">
@@ -264,6 +270,10 @@
             const ctx = canvas.getContext('2d');
             const imageUpload = document.getElementById('image-upload');
             const presetBgBtn = document.getElementById('preset-bg-btn');
+            const charNameBox = document.getElementById('char-name-box');
+            const charNameInput = document.getElementById('char-name-input');
+            const charNameLabel = document.getElementById('char-name-label');
+            const lineTextLabel = document.getElementById('line-text-label');
             const lineInput = document.getElementById('line-input');
             const lineColorInput = document.getElementById('line-color');
             const addLineBtn = document.getElementById('add-line-btn');
@@ -293,70 +303,50 @@
             let currentType = 'chat'; // 'chat', 'me', 'do', 'whisper'
             let bgImage = new Image();
             let isBgLoaded = false;
-            let dialogueLines = []; // Default empty array as requested
+            let dialogueLines = [];
             
             // Text Placement Coordinates
             let textPosition = { x: 20, y: 20 };
             let isDragging = false;
             let dragStart = { x: 0, y: 0 };
 
-            // Presets Colors
+            // Presets Colors (Warna Ungu dibuat lebih pekat & jelas: #D6A6ED / #C2A2DA)
             const PRESET_COLORS = {
                 chat: '#FFFFFF',
-                me: '#C2A2DA',
-                do: '#C2A2DA',
+                me: '#D6A6ED',
+                do: '#D6A6ED',
                 whisper: '#FFFF00'
             };
 
             // Initialize App
             function init() {
-                dialogueLines = []; // Empty lines
+                dialogueLines = [];
                 lineColorInput.value = PRESET_COLORS[currentType];
+                updateFormForType(currentType);
                 loadDefaultBg();
                 bindEvents();
                 renderLinesList();
             }
 
-            // Create Canvas Placeholder Background
-            function loadDefaultBg() {
-                const dummyCanvas = document.createElement('canvas');
-                dummyCanvas.width = 1280;
-                dummyCanvas.height = 720;
-                const dCtx = dummyCanvas.getContext('2d');
-                
-                // Dark background gradient
-                const grad = dCtx.createLinearGradient(0, 0, 1280, 720);
-                grad.addColorStop(0, '#1e293b');
-                grad.addColorStop(1, '#0f172a');
-                dCtx.fillStyle = grad;
-                dCtx.fillRect(0, 0, 1280, 720);
-
-                // Grid pattern
-                dCtx.strokeStyle = '#334155';
-                dCtx.lineWidth = 1;
-                for(let x = 0; x < 1280; x += 60) {
-                    dCtx.beginPath(); dCtx.moveTo(x, 0); dCtx.lineTo(x, 720); dCtx.stroke();
+            // Update Form UI based on Type
+            function updateFormForType(type) {
+                if (type === 'chat') {
+                    charNameBox.classList.remove('hidden');
+                    charNameLabel.textContent = 'Nama Karakter (Chat Biasa)';
+                    charNameInput.placeholder = 'Contoh: Brody Lame';
+                    lineTextLabel.textContent = 'Isi Percakapan';
+                    lineInput.placeholder = 'Contoh: Sudah sesuai ya harga yang kita omongin tadi?';
+                } else if (type === 'do') {
+                    charNameBox.classList.remove('hidden');
+                    charNameLabel.textContent = 'Nama Karakter (RP /do)';
+                    charNameInput.placeholder = 'Contoh: Brody Lame';
+                    lineTextLabel.textContent = 'Deskripsi RP /do';
+                    lineInput.placeholder = 'Contoh: Terlihat kunci toko berada di meja';
+                } else {
+                    charNameBox.classList.add('hidden');
+                    lineTextLabel.textContent = type === 'me' ? 'Teks RP /me' : 'Teks Whisper';
+                    lineInput.placeholder = type === 'me' ? 'Contoh: mengambil kunci toko dari saku' : 'Contoh: Whisper to Lofichala: Permisi';
                 }
-                for(let y = 0; y < 720; y += 60) {
-                    dCtx.beginPath(); dCtx.moveTo(0, y); dCtx.lineTo(1280, y); dCtx.stroke();
-                }
-
-                // Placeholder Info Text
-                dCtx.fillStyle = '#64748b';
-                dCtx.font = 'bold 26px Arial';
-                dCtx.textAlign = 'center';
-                dCtx.fillText('SSRP Edit Tools by SkyTechnology Company', 640, 330);
-                dCtx.font = '16px Arial';
-                dCtx.fillText('Upload foto screenshot Anda atau tambahkan teks melalui panel sebelah kiri', 640, 370);
-
-                bgImage.src = dummyCanvas.toDataURL();
-                bgImage.onload = () => {
-                    isBgLoaded = true;
-                    setCanvasSize(bgImage.width, bgImage.height);
-                    updatePositionLimits();
-                    setPositionPreset('bottom-left');
-                    draw();
-                };
             }
 
             // Bind Event Listeners
@@ -377,6 +367,7 @@
                         
                         currentType = btn.dataset.type;
                         lineColorInput.value = PRESET_COLORS[currentType];
+                        updateFormForType(currentType);
                     });
                 });
 
@@ -466,6 +457,45 @@
                 canvas.addEventListener('touchend', onMouseUp);
             }
 
+            // Create Canvas Placeholder Background
+            function loadDefaultBg() {
+                const dummyCanvas = document.createElement('canvas');
+                dummyCanvas.width = 1280;
+                dummyCanvas.height = 720;
+                const dCtx = dummyCanvas.getContext('2d');
+                
+                const grad = dCtx.createLinearGradient(0, 0, 1280, 720);
+                grad.addColorStop(0, '#1e293b');
+                grad.addColorStop(1, '#0f172a');
+                dCtx.fillStyle = grad;
+                dCtx.fillRect(0, 0, 1280, 720);
+
+                dCtx.strokeStyle = '#334155';
+                dCtx.lineWidth = 1;
+                for(let x = 0; x < 1280; x += 60) {
+                    dCtx.beginPath(); dCtx.moveTo(x, 0); dCtx.lineTo(x, 720); dCtx.stroke();
+                }
+                for(let y = 0; y < 720; y += 60) {
+                    dCtx.beginPath(); dCtx.moveTo(0, y); dCtx.lineTo(1280, y); dCtx.stroke();
+                }
+
+                dCtx.fillStyle = '#64748b';
+                dCtx.font = 'bold 26px Arial';
+                dCtx.textAlign = 'center';
+                dCtx.fillText('SSRP Edit Tools by SkyTechnology Company', 640, 330);
+                dCtx.font = '16px Arial';
+                dCtx.fillText('Upload foto screenshot Anda atau tambahkan teks melalui panel sebelah kiri', 640, 370);
+
+                bgImage.src = dummyCanvas.toDataURL();
+                bgImage.onload = () => {
+                    isBgLoaded = true;
+                    setCanvasSize(bgImage.width, bgImage.height);
+                    updatePositionLimits();
+                    setPositionPreset('bottom-left');
+                    draw();
+                };
+            }
+
             // Image Upload Handler
             function handleImageUpload(e) {
                 const file = e.target.files[0];
@@ -488,7 +518,6 @@
                 reader.readAsDataURL(file);
             }
 
-            // Set Canvas Dimension
             function setCanvasSize(w, h) {
                 canvas.width = w;
                 canvas.height = h;
@@ -500,7 +529,6 @@
                 posYInput.max = canvas.height;
             }
 
-            // Set Position Presets
             function setPositionPreset(preset) {
                 const padding = 20;
                 const fontSize = parseInt(fontSizeInput.value);
@@ -524,18 +552,27 @@
 
             // Add Line to List
             function addLine() {
-                let text = lineInput.value.trim();
-                if (!text) return;
+                let rawText = lineInput.value.trim();
+                let name = charNameInput.value.trim();
+                if (!rawText) return;
 
-                // Auto Prefix only for /me (RP /do dan whisper tidak menggunakan prefix '*')
-                if (currentType === 'me' && !text.startsWith('*')) {
-                    text = `* ${text}`;
+                let formattedText = rawText;
+
+                // Format sesuai pilihan Tipe Dialog
+                if (currentType === 'chat') {
+                    const namePrefix = name ? `${name} says: ` : '';
+                    formattedText = `${namePrefix}${rawText}`;
+                } else if (currentType === 'do') {
+                    const nameSuffix = name ? ` ((${name}))` : '';
+                    formattedText = `${rawText}${nameSuffix}`;
+                } else if (currentType === 'me' && !rawText.startsWith('*')) {
+                    formattedText = `* ${rawText}`;
                 }
 
                 const newLine = {
                     id: Date.now(),
                     type: currentType,
-                    text: text,
+                    text: formattedText,
                     color: lineColorInput.value
                 };
 
@@ -601,11 +638,9 @@
             function draw() {
                 if (!isBgLoaded) return;
 
-                // Clear & Redraw Background
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
 
-                // Font Configurations
                 const fontSize = parseInt(fontSizeInput.value);
                 const lineSpacing = parseInt(lineHeightInput.value);
                 const strokeWidth = parseInt(textStrokeSelect.value);
@@ -618,12 +653,10 @@
 
                 let currentY = textPosition.y;
 
-                // Render each line with optional stroke/shadow
                 dialogueLines.forEach((line) => {
                     const text = line.text;
                     const x = textPosition.x;
 
-                    // Stroke Outline Hitam hanya jika strokeWidth > 0
                     if (strokeWidth > 0) {
                         ctx.strokeStyle = '#000000';
                         ctx.lineWidth = strokeWidth * 2;
@@ -631,16 +664,13 @@
                         ctx.miterLimit = 2;
                         ctx.strokeText(text, x, currentY);
 
-                        // Offset Shadow untuk kedalaman teks
                         ctx.fillStyle = '#000000';
                         ctx.fillText(text, x + 1, currentY + 1);
                     }
 
-                    // Main Text Fill Color (Warna Utama Teks)
                     ctx.fillStyle = line.color || '#FFFFFF';
                     ctx.fillText(text, x, currentY);
 
-                    // Next line offset
                     currentY += fontSize + lineSpacing;
                 });
             }
@@ -671,7 +701,6 @@
                 textPosition.x = Math.round(pos.x - dragStart.x);
                 textPosition.y = Math.round(pos.y - dragStart.y);
 
-                // Update UI Sliders
                 posXInput.value = textPosition.x;
                 posYInput.value = textPosition.y;
                 posXVal.textContent = textPosition.x;
@@ -685,7 +714,6 @@
                 isDragging = false;
             }
 
-            // Download Canvas as PNG Image
             function downloadCanvas() {
                 const link = document.createElement('a');
                 link.download = `SSRP_Edit_${Date.now()}.png`;
@@ -694,7 +722,6 @@
                 showToast('Gambar berhasil di-download!');
             }
 
-            // Helper Toast Notification
             function showToast(msg) {
                 const toast = document.getElementById('toast');
                 const toastMsg = document.getElementById('toast-msg');
@@ -708,7 +735,6 @@
                 }, 3000);
             }
 
-            // Run Init
             init();
         });
     </script>
